@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 // import 'package:hackathon/reportKillPage.dart';
 import 'package:hackathon/reportPage.dart';
+import 'package:hackathon/myReportPage.dart';
 
 class MyHomePage extends StatefulWidget {
   final String title;
@@ -118,26 +119,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 ]),
               ),
             ),
-            Container(
-              height: 80.0,
-              width: 300.0,
-              child: Card(
-                elevation: 8.0,
-                color: Color(0xffcf9812A),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                        child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              " Report Roadkills",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16.0),
-                            )))
-                  ],
+            GestureDetector(
+              onTap: (){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => MyReportPage()));
+              },
+                child: Container(
+                height: 80.0,
+                width: 300.0,
+                child: Card(
+                  elevation: 8.0,
+                  color: Color(0xffcf9812A),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Center(
+                          child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "My Report",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0),
+                              )))
+                    ],
+                  ),
                 ),
               ),
             )
