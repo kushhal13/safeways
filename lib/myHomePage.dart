@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:hackathon/reportKillPage.dart';
+// import 'package:hackathon/reportKillPage.dart';
+import 'package:hackathon/reportPage.dart';
 
 class MyHomePage extends StatefulWidget {
   final String title;
@@ -62,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
             GestureDetector(
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ReportKillPage()));
+                    MaterialPageRoute(builder: (context) => ReportPage()));
               },
               child: Container(
                 margin: const EdgeInsets.all(8.0),
