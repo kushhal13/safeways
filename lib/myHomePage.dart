@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:hackathon/mapPage.dart';
 // import 'package:hackathon/reportKillPage.dart';
 import 'package:hackathon/reportPage.dart';
 import 'package:hackathon/myReportPage.dart';
@@ -17,6 +19,26 @@ class _MyHomePageState extends State<MyHomePage> {
     "images/pic2.jpg",
     "images/pic4.jpg",
   ];
+  final List<Details> detailList = new List();
+  Dio dio = Dio();
+
+  Future<dynamic> getDetails() async {
+    try {
+      var responseBody =
+          await dio.get("https://safe-wayss.herokuapp.com/api/reports");
+      print("responseBody:$responseBody");
+      var reportsData = responseBody.data['reports'];
+      print("responseBody:$reportsData");
+      reportsData.forEach((item) => detailList.add(Details(
+            speciesName: item['speciesName'],
+            area: item['area'],
+            // createdAt: item['createdAt'],
+          )));
+    } catch (e) {
+      print("error:$e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 autoPlay: true,
                 autoPlayInterval: Duration(seconds: 2),
                 autoPlayAnimationDuration: Duration(milliseconds: 800),
-                pauseAutoPlayOnTouch: Duration(seconds: 10),
+                pauseAutoPlayOnTouch: Duration(seconds: 1),
                 enlargeCenterPage: true,
                 height: 300.0,
                 items: imageList.map((i) {
@@ -61,15 +83,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 }).toList(),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ReportPage()));
-              },
-              child: Container(
-                margin: const EdgeInsets.all(8.0),
-                child: Column(children: <Widget>[
-                  Container(
+            Container(
+              margin: const EdgeInsets.all(8.0),
+              child: Column(children: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ReportPage()));
+                  },
+                  child: Container(
                     height: 80.0,
                     width: 300.0,
                     child: Card(
@@ -92,7 +114,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                   ),
-                  Container(
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => MapPage()));
+                  },
+                  child: Container(
                     margin: const EdgeInsets.all(16.0),
                     height: 80.0,
                     width: 300.0,
@@ -115,16 +143,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                     ),
-                  )
-                ]),
-              ),
+                  ),
+                )
+              ]),
             ),
             GestureDetector(
-              onTap: (){
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MyReportPage()));
+              onTap: () {
+                getDetails();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            MyReportPage(detailList: detailList)));
               },
-                child: Container(
+              child: Container(
                 height: 80.0,
                 width: 300.0,
                 child: Card(
@@ -153,4 +185,15 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+class Details {
+  String speciesName;
+  String area;
+  // DateTime createdAt;
+  Details({
+    this.speciesName,
+    this.area,
+    // this.createdAt,
+  });
 }

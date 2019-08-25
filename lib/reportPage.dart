@@ -1,19 +1,9 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
-class TabbarPage extends StatefulWidget {
-  @override
-  _TabbarPageState createState() => _TabbarPageState();
-}
-
-class _TabbarPageState extends State<TabbarPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class ReportPage extends StatefulWidget {
   @override
@@ -32,6 +22,28 @@ class _ReportPageState extends State<ReportPage> {
   var currentItemSelected = "Dead";
   var dailog;
   File newImage;
+
+  var alertStyle = AlertStyle(
+    animationType: AnimationType.fromTop,
+    isCloseButton: false,
+    isOverlayTapDismiss: false,
+    descStyle: TextStyle(fontWeight: FontWeight.bold),
+    animationDuration: Duration(milliseconds: 400),
+    alertBorder: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(0.0),
+      side: BorderSide(
+        color: Colors.grey,
+      ),
+    ),
+    titleStyle: TextStyle(
+      color: Colors.red,
+    ),
+  );
+
+  Dio dio = Dio();
+
+  TextEditingController speciesName = new TextEditingController();
+  TextEditingController area = new TextEditingController();
 
   Future optionsDialogBox() {
     return dailog != null
@@ -70,6 +82,32 @@ class _ReportPageState extends State<ReportPage> {
             });
   }
 
+  Future<dynamic> makeReport(String speciesName, String area) async {
+    try {
+      Options options = Options(
+        contentType: ContentType.parse('application/json'),
+      );
+
+      Response response = await dio.post(
+          'https://safe-wayss.herokuapp.com/api/reports',
+          data: {"speciesName": speciesName, "area": area},
+          options: options);
+      // return response;
+      print("response:$response");
+    } on DioError catch (exception) {
+      if (exception == null ||
+          exception.toString().contains('SocketException')) {
+        throw Exception("Network Error");
+      } else if (exception.type == DioErrorType.RECEIVE_TIMEOUT ||
+          exception.type == DioErrorType.CONNECT_TIMEOUT) {
+        throw Exception(
+            "Could'nt connect, please ensure you have a stable network.");
+      } else {
+        return null;
+      }
+    }
+  }
+
   Future getImage(bool isCamera) async {
     File image;
     if (isCamera) {
@@ -85,6 +123,7 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xffcf9812A),
         title: Text("Register page"),
       ),
       body: SingleChildScrollView(
@@ -177,6 +216,7 @@ class _ReportPageState extends State<ReportPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                controller: speciesName,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: const BorderRadius.all(
@@ -185,7 +225,7 @@ class _ReportPageState extends State<ReportPage> {
                     ),
                     filled: true,
                     hintStyle: TextStyle(color: Colors.grey[800]),
-                    hintText: "Type in your text",
+                    hintText: "Leave blank if unknown",
                     fillColor: Colors.white70),
               ),
             ),
@@ -206,6 +246,7 @@ class _ReportPageState extends State<ReportPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                controller: area,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: const BorderRadius.all(
@@ -214,7 +255,7 @@ class _ReportPageState extends State<ReportPage> {
                     ),
                     filled: true,
                     hintStyle: TextStyle(color: Colors.grey[800]),
-                    hintText: "Type in your text",
+                    hintText: "Enter location",
                     fillColor: Colors.white70),
               ),
             ),
@@ -330,7 +371,15 @@ class _ReportPageState extends State<ReportPage> {
                   child: new InkWell(
                     onTap: () => print('hello'),
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        makeReport(speciesName.text, area.text);
+                        Alert(
+                          context: context,
+                          type: AlertType.success,
+                          title: "Thank YOu",
+                          desc: "Your response has been sucessfully taken",
+                        ).show();
+                      },
                       child: new Container(
                         width: 150.0,
                         height: 50.0,
